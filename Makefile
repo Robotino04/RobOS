@@ -2,7 +2,7 @@
 # HEADERS = $(wildcard src/kernel/*.h src/drivers/*.h)
 # OBJ = ${C_SOURCES:.c=.o}
 
-arch := x86_64
+arch ?= x86_64
 kernel := bin/kernel-$(arch).bin
 iso := bin/RobOS-$(arch).iso
 
@@ -11,8 +11,14 @@ grub_cfg := src/arch/$(arch)/grub.cfg
 
 assembly_source_files := $(shell find . -type f -wholename './src/arch/$(arch)/*.asm')
 assembly_object_files := $(patsubst ./src/arch/$(arch)/%.asm, ./bin/arch/$(arch)/%.o, $(assembly_source_files))
+assembly_include_dir := ./src/arch/$(arch)/
 
-.PHONY: all run iso clean
+rust_source_files := $(shell find . -type f -wholename './src/*.rs')
+
+target ?= $(arch)-rob_os
+rust_os := target/$(target)/debug/librob_os.a
+
+.PHONY: all run iso clean kernel
 
 all: iso
 
@@ -28,13 +34,17 @@ $(iso): $(kernel) $(grub_cfg)
 	grub-mkrescue -o $(iso) bin/isofiles 2> /dev/null
 	rm -r bin/isofiles
 
-$(kernel): $(assembly_object_files) $(linker_script)
-	ld -n -T $(linker_script) -o $(kernel) $(assembly_object_files)
+$(kernel): kernel $(rust_os) $(assembly_object_files) $(linker_script)
+	ld -n -T $(linker_script) -o $(kernel) $(assembly_object_files) $(rust_os)
+
+kernel: $(rust_source_files)
+	RUST_TARGET_PATH=$(shell pwd) xargo build --target $(target)
 
 # compile assembly files
 bin/arch/$(arch)/%.o: src/arch/$(arch)/%.asm
 	mkdir -p $(shell dirname $@)
-	nasm -felf64 $< -o $@
+	nasm -felf64 -I $(assembly_include_dir) $< -o $@
 
-clean :
+clean:
 	rm -f $(assembly_object_files) $(iso) $(kernel)
+	xargo clean
