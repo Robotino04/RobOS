@@ -11,6 +11,7 @@ extern crate spin;
 mod vga_buffer;
 
 #[no_mangle]
+pub extern fn rust_main(multiboot_address: usize) -> !{
     vga_buffer::WRITER.lock().set_background(vga_buffer::Color::Black);
     vga_buffer::WRITER.lock().set_foreground(vga_buffer::Color::Green);
     println!("Rust OK");
