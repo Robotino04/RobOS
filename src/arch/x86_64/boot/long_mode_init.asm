@@ -14,7 +14,7 @@ long_mode_start:
     mov fs, ax
     mov gs, ax
     
-    ; print "ASM OK"
+    ; print "asm OK"
     mov rax, 0x0220026d02730261
     mov qword [VGA_POSITION(0, VGA_HEIGHT-2)], rax
     mov rax, 0x00000000024b024f

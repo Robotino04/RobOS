@@ -74,14 +74,26 @@ impl Writer {
         }
     }
 
-    #[allow(dead_code)]
+    #[allow(unused)]
     pub fn color(&self) -> &ColorCode {
         &self.color_code
     }
     
-    #[allow(dead_code)]
+    #[allow(unused)]
     pub fn color_mut(&mut self) -> &mut ColorCode {
         &mut self.color_code
+    }
+
+    #[allow(unused)]
+    pub fn set_foreground(&mut self, fg: Color){
+        self.color_code.0 &= 0b11110000;
+        self.color_code.0 |= fg as u8;
+    }
+    
+    #[allow(unused)]
+    pub fn set_background(&mut self, bg: Color){
+        self.color_code.0 &= 0b00001111;
+        self.color_code.0 |= (bg as u8) << 4;
     }
 
     fn buffer(&mut self) -> &mut Buffer {
@@ -146,9 +158,16 @@ macro_rules! println {
     ($fmt:expr, $($arg:tt)*) => (print!(concat!($fmt, "\n"), $($arg)*));
 }
 
-#[allow(dead_code)]
+
+
+#[allow(unused)]
 pub fn clear_screen() {
     for _ in 0..BUFFER_HEIGHT {
         println!("");
     }
+}
+
+#[allow(unused)]
+pub fn set_color(color: ColorCode){
+    *WRITER.lock().color_mut() = color;
 }

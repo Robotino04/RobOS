@@ -11,10 +11,8 @@ extern crate spin;
 mod vga_buffer;
 
 #[no_mangle]
-pub extern fn rust_main() -> !{
-    *vga_buffer::WRITER.lock().color_mut() = vga_buffer::ColorCode::new(
-        vga_buffer::Color::Green, vga_buffer::Color::Black
-    );
+    vga_buffer::WRITER.lock().set_background(vga_buffer::Color::Black);
+    vga_buffer::WRITER.lock().set_foreground(vga_buffer::Color::Green);
     println!("Rust OK");
 
     loop{}
@@ -27,6 +25,9 @@ pub extern fn eh_personality() {}
 use core::panic::PanicInfo;
 
 #[panic_handler]
-fn panic(_info: &PanicInfo) -> ! {
+fn panic_handler(info: &PanicInfo) -> ! {
+    vga_buffer::WRITER.lock().set_foreground(vga_buffer::Color::Red);
+    print!("{}", info);
+    vga_buffer::WRITER.lock().set_foreground(vga_buffer::Color::Green);
     loop {}
 }
