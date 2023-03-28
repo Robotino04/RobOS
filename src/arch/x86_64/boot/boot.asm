@@ -7,6 +7,7 @@ section .text
 bits 32
 start:
     mov esp, stack_top
+    mov edi, ebx        ; multiboot info struct
 
     call check_multiboot
     call check_cpuid

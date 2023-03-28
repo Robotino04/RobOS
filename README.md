@@ -12,17 +12,21 @@ It is written in rust just so I can learn the language (and maybe because I'm fo
 | 3             | rust_main returned. |
 
 # Building
-1. install rustup from [rustup.rs](https://rustup.rs)
+1. install **rustup** from [rustup.rs](https://rustup.rs)
 2. install rust nightly using `$ rustup toolchain install nightly --component rust-src clippy`
 3. switch to rust nightly using `$ rustup default nightly`
-4. install xargo using `$ cargo install xargo`
+4. install **xargo** using `$ cargo install xargo`
 5. install gcc things using your package manager (make, gcc, ld, etc.)
-6. install grub-mkrescue and xorriso  using your package manager
+6. install **grub-mkrescue** and **xorriso**  using your package manager
 6. compile the kernel with `$ make all`
 
 # Running
-You can either burn the generated ISO to a disk/USB and run it on real hardware (may harm the hardware)
-or you can install qemu-system-x86_64 and use `$ make run` ru run RobOS in a vm.
+You can either burn the generated ISO to a disk/USB and run it on real hardware (use at your own risk!!)
+or you can install qemu-system-x86_64 and use `$ make run` to run RobOS in a vm.
+
+# Debugging
+To debug RobOS you can execute `$ make debug` which starts qemu and waits for a gdb frontent to attach on port 1234.
+VS Code users can also install **tmux** and use the provided *launch.json* for graphical debugging.
 
 # Troubleshooting
 If the generated ISO won't boot and is really small, you may need to install something like ubuntus `grub-pc-bin`.

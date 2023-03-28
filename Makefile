@@ -18,12 +18,14 @@ rust_source_files := $(shell find . -type f -wholename './src/*.rs')
 target ?= $(arch)-rob_os
 rust_os := target/$(target)/debug/librob_os.a
 
-.PHONY: all run iso clean kernel
+.PHONY: all run iso clean kernel debug
 
 all: iso
 
 run: $(iso)
 	qemu-system-x86_64 -cdrom $(iso)
+debug: $(iso)
+	qemu-system-x86_64 -s -S -cdrom $(iso)
 
 iso: $(iso)
 
@@ -35,7 +37,7 @@ $(iso): $(kernel) $(grub_cfg)
 	rm -r bin/isofiles
 
 $(kernel): kernel $(rust_os) $(assembly_object_files) $(linker_script)
-	ld -n -T $(linker_script) -o $(kernel) $(assembly_object_files) $(rust_os)
+	ld -g -n -T $(linker_script) -o $(kernel) $(assembly_object_files) $(rust_os)
 
 kernel: $(rust_source_files)
 	RUST_TARGET_PATH=$(shell pwd) xargo build --target $(target)
@@ -43,7 +45,7 @@ kernel: $(rust_source_files)
 # compile assembly files
 bin/arch/$(arch)/%.o: src/arch/$(arch)/%.asm
 	mkdir -p $(shell dirname $@)
-	nasm -felf64 -I $(assembly_include_dir) $< -o $@
+	nasm -g -felf64 -I $(assembly_include_dir) $< -o $@
 
 clean:
 	rm -f $(assembly_object_files) $(iso) $(kernel)
