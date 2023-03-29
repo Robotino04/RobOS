@@ -43,7 +43,7 @@ impl FrameAllocator for AreaFrameAllocator<'_> {
 impl AreaFrameAllocator<'_>{
     fn choose_next_area(&mut self){
         self.current_area = self.areas.clone().filter(|area| {
-            Frame::containing_address(area.end_address() as usize) >= self.next_free_frame
+            Frame::containing_address((area.end_address() - 1) as usize) >= self.next_free_frame
         }).min_by_key(|area| area.start_address());
         
         if let Some(area) = self.current_area{
@@ -68,6 +68,6 @@ impl AreaFrameAllocator<'_>{
             multiboot_end: Frame::containing_address(multiboot_end)
         };
         allocator.choose_next_area();
-        return allocator
+        return allocator;
     }
 }
